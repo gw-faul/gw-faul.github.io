@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tic Tac Toe - Level 2 Hard</title>
+<style>
+body{background:#0d0d0d;color:white;text-align:center;font-family:sans-serif;padding-top:40px}
+h2{margin-bottom:5px}
+#board{display:grid;grid-template-columns:repeat(3,100px);gap:8px;justify-content:center;margin:20px auto}
+.cell{width:100px;height:100px;background:#1a1a1a;font-size:60px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:12px;font-weight:bold;transition:0.2s}
+.cell:hover{filter:brightness(1.3)}
+button{padding:10px 20px;margin-top:15px;cursor:pointer;border:none;border-radius:8px}
+#status{font-size:18px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<h2>Level 3/3: Hard tik tak toe</h2>
+<div id="status">Your turn - X</div>
+<div id="board"></div>
+<button onclick="resetGame()">Reset</button>
+
+<script>
+let board=Array(9).fill("");let player="X";let bot="O";let gameOver=false;let botTurn=false;
+let winLink="https://google.com"; // change to your final link
+
+const boardDiv=document.getElementById("board");
+const statusDiv=document.getElementById("status");
+
+boardDiv.innerHTML="";
+for(let i=0;i<9;i++){let cell=document.createElement("div");cell.className="cell";cell.onclick=()=>click(i);boardDiv.appendChild(cell);}
+updateBoard();
+
+function click(i){
+if(board[i]||gameOver||botTurn)return;
+board[i]=player;updateBoard();
+if(checkWin(board,player)){highlightWin(player,"green");statusDiv.innerText="🎉 You beat Hard Mode! Redirecting...";gameOver=true;setTimeout(()=>window.location.href=winLink,1500);return;}
+if(checkDraw(board)){statusDiv.innerText="Draw! Bot is too smart";gameOver=true;return;}
+botTurn=true;statusDiv.innerText="Bot is thinking...";
+setTimeout(()=>{botMove();botTurn=false;},400);
+}
+
+function botMove(){
+let move=minimax(board,bot).index;
+board[move]=bot;updateBoard();
+if(checkWin(board,bot)){highlightWin(bot,"red");statusDiv.innerText="💀 Bot wins! Unbeatable";gameOver=true;return;}
+if(checkDraw(board)){statusDiv.innerText="Draw!";gameOver=true;return;}
+statusDiv.innerText="Your turn - X";
+}
+
+function minimax(newBoard,p){
+let empty=newBoard.map((v,i)=>v===""?i:null).filter(v=>v!==null);
+if(checkWin(newBoard,player))return{score:-10};
+if(checkWin(newBoard,bot))return{score:10};
+if(empty.length===0)return{score:0};
+let moves=[];
+for(let i of empty){
+let move={};move.index=i;
+newBoard[i]=p;
+let result=minimax(newBoard,p===bot?player:bot);
+move.score=result.score;
+newBoard[i]="";moves.push(move);
+}
+let bestMove;
+if(p===bot){
+let bestScore=-Infinity;
+for(let i=0;i<moves.length;i++){if(moves[i].score>bestScore){bestScore=moves[i].score;bestMove=i;}}
+}else{
+let bestScore=Infinity;
+for(let i=0;i<moves.length;i++){if(moves[i].score<bestScore){bestScore=moves[i].score;bestMove=i;}}
+}
+return moves[bestMove];
+}
+
+function updateBoard(){
+document.querySelectorAll(".cell").forEach((cell,i)=>{
+cell.innerText=board[i]||"";
+if(board[i]==="X"){cell.style.background="#FFD700";cell.style.color="#000";}
+else if(board[i]==="O"){cell.style.background="#FF4444";cell.style.color="#fff";}
+else{cell.style.background="#1a1a1a";cell.style.color="white";}
+});
+}
+
+function highlightWin(p,color){
+let win=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let combo=win.find(w=>w.every(i=>board[i]===p));
+if(combo){combo.forEach(i=>{document.querySelectorAll(".cell")[i].style.background=color;document.querySelectorAll(".cell")[i].style.color="#fff";});}
+}
+
+function checkWin(b,p){let w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];return w.some(x=>x.every(i=>b[i]===p));}
+function checkDraw(b){return b.every(x=>x);}
+function resetGame(){board=Array(9).fill("");gameOver=false;botTurn=false;statusDiv.innerText="Your turn - X";updateBoard();}
+</script>
+</body>
+</html>
