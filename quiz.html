@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Quiz Level 1</title>
+<style>
+body{background:#0d0d0d;color:white;text-align:center;font-family:sans-serif;padding:40px}
+.box{background:#1a1a1a;padding:30px;border-radius:15px;max-width:500px;margin:auto}
+button{display:block;width:100%;margin:8px 0;padding:12px;border:none;border-radius:8px;cursor:pointer;background:#333;color:white;font-size:16px}
+button:hover{background:#555}
+#status{margin-top:15px;font-size:18px}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>Level 1/3: Quick quiz</h2>
+<div id="question"></div>
+<div id="answers"></div>
+<div id="status"></div>
+</div>
+
+<script>
+let questions=[
+  {q:"What is 2 + 2?", a:["3","4","5"], correct:1},
+  {q:"What color is the sky?", a:["Blue","Green","Red"], correct:0},
+  {q:"Why does moon exist?", a:["idk","to make waves","why you ask me"], correct:2}
+];
+let current=0;
+let score=0;
+
+showQuestion();
+
+function showQuestion(){
+if(current>=questions.length){
+  if(score===questions.length){
+    document.getElementById("status").innerText="All correct! Loading Level 2...";
+    setTimeout(()=>location.href="tikeasy.html",1500);
+  } else {
+    document.getElementById("status").innerText="Wrong answers! Refresh to retry";
+  }
+  return;
+}
+let q=questions[current];
+document.getElementById("question").innerHTML=`<h3>Question ${current+1}: ${q.q}</h3>`;
+let answersDiv=document.getElementById("answers");
+answersDiv.innerHTML="";
+q.a.forEach((ans,i)=>{
+  let btn=document.createElement("button");
+  btn.innerText=ans;
+  btn.onclick=()=>checkAnswer(i);
+  answersDiv.appendChild(btn);
+});
+}
+
+function checkAnswer(i){
+if(i===questions[current].correct){score++;}
+current++;
+showQuestion();
+}
+</script>
+</body>
+</html>
